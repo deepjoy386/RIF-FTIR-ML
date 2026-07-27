@@ -14,7 +14,7 @@ The pipeline includes:
 
 - FTIR spectral preprocessing
 - Exploratory data analysis
-- Principal Component Analysis (PCA)
+- PCA (unsupervised) and LDA/PLS-DA (supervised) spectral projections
 - Machine learning model comparison
 - Random Forest hyperparameter tuning
 - Nested Cross Validation
@@ -118,8 +118,10 @@ RIF-FTIR-ML/
 
 ## Machine Learning Models
 
-The following supervised learning algorithms were evaluated:
+The following supervised learning algorithms are evaluated:
 
+- Linear Discriminant Analysis (LDA)
+- Partial Least Squares Discriminant Analysis (PLS-DA)
 - Logistic Regression
 - Support Vector Machine (SVM)
 - Random Forest
@@ -137,6 +139,8 @@ The FTIR spectra were preprocessed using:
 - Vector (L2) normalization
 
 These preprocessing steps were incorporated into the machine learning pipeline to prevent data leakage during cross-validation.
+
+The mean-spectrum figure is calculated from the saved **processed spectra** (smoothed and vector-normalized), rather than from raw spectra.
 
 ---
 
@@ -214,6 +218,17 @@ Execute the notebooks in the following order:
 5. `05_random_forest_tuning.ipynb`
 6. `06_final_evaluation.ipynb`
 7. `07_feature_importance.ipynb`
+
+To reproduce the feedback updates in one step, run:
+
+```bash
+python scripts/generate_feedback_outputs.py
+```
+
+This regenerates `data/processed_spectra.csv`, the processed mean-spectrum plot,
+the PCA/LDA/PLS-DA projection figure, and two data-driven grouped model-comparison
+plots. PCA is unsupervised; LDA and PLS-DA use the class labels and are therefore
+reported as supervised analyses.
 
 ---
 

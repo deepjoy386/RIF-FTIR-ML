@@ -6,7 +6,7 @@ from sklearn.preprocessing import normalize
 def smooth_spectra(
     X,
     window_length=11,
-    polyorder=3
+    polyorder=2
 ):
     """
     Apply Savitzky-Golay smoothing.

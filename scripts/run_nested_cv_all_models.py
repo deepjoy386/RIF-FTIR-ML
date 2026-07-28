@@ -44,18 +44,19 @@ def plot_nested_results(results):
             label=label,
         )
 
-    ax.set(ylim=(0, 1.08), ylabel="Nested-CV outer-fold score",
+    # Reserve a small in-panel band above the tallest error bar for the legend.
+    ax.set(ylim=(0, 1.14), ylabel="Nested-CV outer-fold score",
            title="Nested Cross-Validation: Tuned Model Comparison")
     ax.set_xticks(x, results["Model"], rotation=18, ha="right")
     ax.grid(axis="y", color="#D9D9D9", linewidth=0.7, alpha=0.85)
     ax.set_axisbelow(True)
     ax.spines[["top", "right"]].set_visible(False)
-    # Use the upper-right figure corner so the key never obscures a bar.
-    ax.legend(title="Performance metric", frameon=True, facecolor="white",
-              edgecolor="#BDBDBD", ncols=1, loc="upper left",
-              bbox_to_anchor=(1.01, 1.0), borderaxespad=0.0,
-              handletextpad=0.5)
-    fig.tight_layout(rect=(0, 0, 0.84, 1))
+    # Compact two-column key in the clear upper-right corner.
+    ax.legend(frameon=True, facecolor="white", edgecolor="#BDBDBD", ncols=2, loc="upper right",
+              bbox_to_anchor=(0.985, 0.985), borderaxespad=0.0,
+              handlelength=1.3, handletextpad=0.35, columnspacing=0.9,
+              fontsize=9)
+    fig.tight_layout()
     fig.savefig(ROOT / "figures" / "Figure4_NestedCVModelComparison.png",
                 dpi=300, bbox_inches="tight")
     plt.close(fig)

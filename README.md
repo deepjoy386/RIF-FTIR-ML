@@ -230,6 +230,18 @@ the PCA/LDA/PLS-DA projection figure, and two data-driven grouped model-comparis
 plots. PCA is unsupervised; LDA and PLS-DA use the class labels and are therefore
 reported as supervised analyses.
 
+To reproduce the nested-CV comparison and the fold-specific optimized
+hyperparameters for every model, run:
+
+```bash
+python scripts/run_nested_cv_all_models.py
+```
+
+This creates `figures/Figure4_NestedCVModelComparison.png` and
+`results/optimized_hyperparameters.csv`. The hyperparameter CSV reports the
+settings selected by the inner cross-validation for each outer fold, together
+with its corresponding inner-CV ROC-AUC.
+
 ---
 
 ## Results

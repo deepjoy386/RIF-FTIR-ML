@@ -6,6 +6,7 @@ Run from the repository root:
 
 from pathlib import Path
 import sys
+import ast
 
 import matplotlib
 matplotlib.use("Agg")
@@ -21,31 +22,64 @@ from models import get_all_models, get_model_param_grids
 
 
 def plot_nested_results(results):
+    """Plot nested-CV metrics using a color-blind-safe, publication palette."""
     metrics = [("accuracy", "Accuracy"), ("precision", "Precision"),
                ("f1", "F1-score"), ("roc_auc", "ROC-AUC")]
     x = np.arange(len(results))
     width = 0.18
-    fig, ax = plt.subplots(figsize=(12, 6))
+    # Okabe-Ito palette: distinct in print and for common color-vision deficiencies.
+    colors = ["#0072B2", "#E69F00", "#009E73", "#CC79A7"]
+    fig, ax = plt.subplots(figsize=(12.5, 6.4))
 
-    for index, (metric, label) in enumerate(metrics):
+    for index, ((metric, label), color) in enumerate(zip(metrics, colors)):
         ax.bar(
             x + (index - 1.5) * width,
             results[f"{metric}_mean"],
             width,
             yerr=results[f"{metric}_std"],
             capsize=3,
-            label=label
+            color=color,
+            edgecolor="#333333",
+            linewidth=0.35,
+            label=label,
         )
 
     ax.set(ylim=(0, 1.08), ylabel="Nested-CV outer-fold score",
            title="Nested Cross-Validation: Tuned Model Comparison")
     ax.set_xticks(x, results["Model"], rotation=18, ha="right")
-    ax.grid(axis="y", alpha=0.2)
-    ax.legend(frameon=False, ncols=2)
-    fig.tight_layout()
+    ax.grid(axis="y", color="#D9D9D9", linewidth=0.7, alpha=0.85)
+    ax.set_axisbelow(True)
+    ax.spines[["top", "right"]].set_visible(False)
+    # Use the upper-right figure corner so the key never obscures a bar.
+    ax.legend(title="Performance metric", frameon=True, facecolor="white",
+              edgecolor="#BDBDBD", ncols=1, loc="upper left",
+              bbox_to_anchor=(1.01, 1.0), borderaxespad=0.0,
+              handletextpad=0.5)
+    fig.tight_layout(rect=(0, 0, 0.84, 1))
     fig.savefig(ROOT / "figures" / "Figure4_NestedCVModelComparison.png",
                 dpi=300, bbox_inches="tight")
     plt.close(fig)
+
+
+def export_optimized_hyperparameters(folds):
+    """Export every fold's inner-CV-selected settings in analysis-ready columns."""
+    rows = []
+    for _, fold in folds.iterrows():
+        params = ast.literal_eval(fold["best_params"])
+        row = {
+            "Model": fold["Model"],
+            "Outer_fold": fold["Fold"],
+            "Inner_CV_ROC_AUC": fold["best_inner_roc_auc"],
+        }
+        row.update({key.removeprefix("classifier__"): value for key, value in params.items()})
+        rows.append(row)
+
+    parameter_columns = sorted({key for row in rows for key in row} -
+                               {"Model", "Outer_fold", "Inner_CV_ROC_AUC"})
+    columns = ["Model", "Outer_fold", "Inner_CV_ROC_AUC", *parameter_columns]
+    pd.DataFrame(rows).reindex(columns=columns).to_csv(
+        ROOT / "results" / "optimized_hyperparameters.csv", index=False
+    )
 
 
 def main():
@@ -59,6 +93,7 @@ def main():
     )
     summary.to_csv(ROOT / "results" / "nested_cv_model_comparison.csv", index=False)
     folds.to_csv(ROOT / "results" / "nested_cv_fold_results.csv", index=False)
+    export_optimized_hyperparameters(folds)
     plot_nested_results(summary)
     print(summary.round(3).to_string(index=False))
     print("Nested-CV results and figure generated successfully.")

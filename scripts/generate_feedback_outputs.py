@@ -104,6 +104,41 @@ def plot_ordinations(X, y):
     plt.close(fig)
 
 
+def plot_lda(X, y):
+    """Create a stand-alone supervised LDA score plot with a clear legend."""
+    y_array = y.to_numpy()
+    lda = LinearDiscriminantAnalysis(solver="svd", n_components=1)
+    scores = lda.fit_transform(X, y_array).ravel()
+    rng = np.random.default_rng(42)
+
+    fig, ax = plt.subplots(figsize=(8.2, 5.4))
+    for label, group_name, marker in ((0, "Control", "o"), (1, "RIF", "^")):
+        mask = y_array == label
+        ax.scatter(
+            scores[mask], rng.normal(0, 0.035, mask.sum()),
+            label=group_name, marker=marker, s=58, color=COLORS[group_name],
+            edgecolor="#222222", linewidth=0.45, alpha=0.88, zorder=3,
+        )
+
+    ax.axvline(0, color="#8A8A8A", linewidth=0.8, linestyle="--", zorder=1)
+    ax.set(
+        title="Supervised Separation of Control and RIF Samples by LDA",
+        xlabel="Linear discriminant 1 (LD1)",
+        ylabel="Jittered sample position (display only)",
+        yticks=[],
+    )
+    ax.grid(axis="x", color="#D9D9D9", linewidth=0.7, alpha=0.8)
+    ax.spines[["top", "right", "left"]].set_visible(False)
+    ax.legend(
+        title="Sample group", frameon=True, facecolor="white", edgecolor="#BDBDBD",
+        ncols=1, loc="upper right", bbox_to_anchor=(0.98, 0.98),
+        borderaxespad=0.0, handletextpad=0.5,
+    )
+    fig.tight_layout()
+    fig.savefig(FIGURES / "Figure3_LDA.png", dpi=300, bbox_inches="tight")
+    plt.close(fig)
+
+
 def evaluate_models(X, y):
     rows = []
     for name, model in get_all_models().items():
@@ -170,6 +205,7 @@ def main():
     X, y = load_and_process_spectra()
     plot_processed_mean_spectra(X, y)
     plot_ordinations(X, y)
+    plot_lda(X, y)
     results = evaluate_models(X, y)
     plot_model_comparisons(results)
     print("Feedback outputs generated successfully.")

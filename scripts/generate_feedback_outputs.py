@@ -104,6 +104,39 @@ def plot_ordinations(X, y):
     plt.close(fig)
 
 
+def plot_pca_lda(X, y):
+    """Project spectra with PCA, then separate classes with LDA on PCA scores."""
+    y_array = y.to_numpy()
+    # PCA avoids fitting LDA directly on the high-dimensional spectra.  Retain
+    # enough unsupervised components to represent 95% of spectral variance,
+    # then learn the discriminant axis using the class labels.
+    pca = PCA(n_components=0.95, svd_solver="full", random_state=42)
+    pca_scores = pca.fit_transform(X)
+    lda = LinearDiscriminantAnalysis(solver="svd", n_components=1)
+    lda_scores = lda.fit_transform(pca_scores, y_array).ravel()
+
+    fig, ax = plt.subplots(figsize=(8.2, 5.4))
+    rng = np.random.default_rng(42)
+    jitter = rng.normal(0, 0.035, len(lda_scores))
+    for label, group_name, marker in ((0, "Control", "o"), (1, "RIF", "^")):
+        mask = y_array == label
+        ax.scatter(lda_scores[mask], jitter[mask], label=group_name, marker=marker,
+                   s=58, c=COLORS[group_name], edgecolor="black", linewidth=0.45, alpha=0.88)
+    ax.axvline(0, color="#8A8A8A", linewidth=0.8, linestyle="--", zorder=1)
+    ax.set(
+        title=f"PCA-LDA Separation of Control and RIF Samples ({pca.n_components_} PCs; 95% variance)",
+        xlabel="Linear discriminant 1 (LD1)",
+        ylabel="Jittered sample position (display only)",
+        yticks=[],
+    )
+    ax.grid(axis="x", alpha=0.18)
+    ax.spines[["top", "right", "left"]].set_visible(False)
+    ax.legend(title="Sample group", frameon=True, facecolor="white", edgecolor="#BDBDBD")
+    fig.tight_layout()
+    fig.savefig(FIGURES / "Figure3_PCA_LDA.png", dpi=300, bbox_inches="tight")
+    plt.close(fig)
+
+
 def plot_lda(X, y):
     """Create a stand-alone supervised LDA score plot with a clear legend."""
     y_array = y.to_numpy()
@@ -205,6 +238,7 @@ def main():
     X, y = load_and_process_spectra()
     plot_processed_mean_spectra(X, y)
     plot_ordinations(X, y)
+    plot_pca_lda(X, y)
     plot_lda(X, y)
     results = evaluate_models(X, y)
     plot_model_comparisons(results)

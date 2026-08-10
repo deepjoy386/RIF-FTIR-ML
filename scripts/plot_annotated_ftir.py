@@ -20,6 +20,7 @@ from preprocess import smooth_spectra, vector_normalize
 
 
 PEAK_ASSIGNMENTS = {
+    952: "",
     1065: "Carbohydrates and phosphates",
     1160: "DNA, phospholipids",
     1225: "Amide III",
@@ -73,7 +74,8 @@ def main():
     ax.set_ylabel("Vector-normalized absorbance (a.u.)", fontsize=13)
     ax.set_title("Annotated Mean FTIR Spectra of RIF and Control Samples", fontsize=15, pad=16)
     ax.tick_params(labelsize=11)
-    ax.legend(title="Group", loc="upper right", frameon=True, edgecolor="#BDBDBD")
+    ax.legend(title="Group", loc="upper right", bbox_to_anchor=(0.91, 1),
+              frameon=True, edgecolor="#BDBDBD")
     for spine in ax.spines.values():
         spine.set_visible(True)
         spine.set_linewidth(1.0)

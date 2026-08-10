@@ -14,12 +14,11 @@ The pipeline includes:
 
 - FTIR spectral preprocessing
 - Exploratory data analysis
-- PCA (unsupervised) and LDA/PLS-DA (supervised) spectral projections
+- Pre-specified univariate spectral band-area comparisons
 - Machine learning model comparison
 - Random Forest hyperparameter tuning
 - Nested Cross Validation
 - Model evaluation
-- Feature importance analysis
 - Publication-quality visualizations
 
 ---
@@ -48,7 +47,7 @@ Savitzky–Golay Smoothing
 Vector Normalization
         │
         ▼
-Principal Component Analysis (PCA)
+Univariate Spectral Band-Area Analysis
         │
         ▼
 Machine Learning Model Comparison
@@ -60,7 +59,6 @@ Random Forest Hyperparameter Optimization
 Nested Cross Validation
         │
         ▼
-Feature Importance Analysis
 ```
 
 ---
@@ -77,7 +75,7 @@ RIF-FTIR-ML/
 ├── figures/
 │   ├── Figure1_RawSpectra.png
 │   ├── Figure2_MeanSpectra.png
-│   ├── Figure3_PCA.png
+│   ├── Figure3_UnivariateBandAreas.png
 │   ├── Figure4_ModelComparison.png
 │   ├── Figure5_ROC.png
 │   ├── Figure6_ConfusionMatrix.png
@@ -89,7 +87,6 @@ RIF-FTIR-ML/
 ├── notebooks/
 │   ├── 01_data_exploration.ipynb
 │   ├── 02_preprocessing.ipynb
-│   ├── 03_pca.ipynb
 │   ├── 04_machine_learning.ipynb
 │   ├── 05_random_forest_tuning.ipynb
 │   ├── 06_final_evaluation.ipynb
@@ -165,11 +162,10 @@ Performance metrics include:
 The repository contains:
 
 - Raw and processed FTIR spectra
-- PCA visualization
+- Univariate spectral band-area comparison
 - Model comparison
 - ROC curve
 - Confusion matrix
-- Feature importance analysis
 - Publication-quality figures
 - Trained Random Forest model
 
@@ -213,11 +209,9 @@ Execute the notebooks in the following order:
 
 1. `01_data_exploration.ipynb`
 2. `02_preprocessing.ipynb`
-3. `03_pca.ipynb`
-4. `04_machine_learning.ipynb`
-5. `05_random_forest_tuning.ipynb`
-6. `06_final_evaluation.ipynb`
-7. `07_feature_importance.ipynb`
+3. `04_machine_learning.ipynb`
+4. `05_random_forest_tuning.ipynb`
+5. `06_final_evaluation.ipynb`
 
 To reproduce the feedback updates in one step, run:
 
@@ -226,9 +220,9 @@ python scripts/generate_feedback_outputs.py
 ```
 
 This regenerates `data/processed_spectra.csv`, the processed mean-spectrum plot,
-the PCA/LDA/PLS-DA projection figure, and two data-driven grouped model-comparison
-plots. PCA is unsupervised; LDA and PLS-DA use the class labels and are therefore
-reported as supervised analyses.
+the spectral-projection figure, and two data-driven grouped model-comparison
+plots. To generate the univariate band-area comparison figure, run
+`python scripts/plot_univariate_ftir.py`.
 
 To reproduce the nested-CV comparison and the fold-specific optimized
 hyperparameters for every model, run:
@@ -249,12 +243,11 @@ with its corresponding inner-CV ROC-AUC.
 The workflow produces:
 
 - Exploratory FTIR visualizations
-- PCA projections
+- Univariate spectral band-area comparisons
 - Performance comparison of multiple classifiers
 - Optimized Random Forest model
 - ROC curve
 - Confusion matrix
-- Feature importance visualization
 
 ---
 
